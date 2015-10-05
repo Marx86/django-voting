@@ -8,6 +8,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
 
 try:
@@ -17,6 +18,11 @@ except ImportError:
 
 from voting.managers import VoteManager
 
+
+if hasattr(settings, 'AUTH_USER_MODEL'):
+    user_model = settings.AUTH_USER_MODEL
+else:
+    user_model = User
 
 SCORES = (
     (+1, '+1'),
@@ -28,7 +34,7 @@ class Vote(models.Model):
     """
     A vote on an object by a User.
     """
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(user_model)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     object = generic.GenericForeignKey('content_type', 'object_id')
